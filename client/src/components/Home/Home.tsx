@@ -18,7 +18,7 @@ const Home = () => {
         socket.on('roomJoinError', (message) => {
             alert(message.error);
         })
-        socket.on('roomJoined', (room: string) => navigate(`/bingo/${room}`));
+        socket.on('roomJoined', (room: string, roomSize: number) => navigate(`/bingo/${room}`));
 
         return () => {
             socket.off('roomJoinError');

@@ -44,3 +44,8 @@ export const Cell = styled.input`
     text-align: center;
     font-size: 4rem;
 `;
+
+export const Text = styled.span`
+    font-size: 5vw;
+    color: #fff;
+`;

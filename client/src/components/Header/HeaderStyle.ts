@@ -41,7 +41,7 @@ export const DropDown = styled.div`
 
 export const ProfileImg = styled.img`
     height: 100%;
-    width: fit-content;i
+    width: fit-content;
     border-radius: 50%;
     background-color: black;
     margin-bottom: 10px;
