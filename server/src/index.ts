@@ -11,6 +11,7 @@ const io = new Server(httpServer, {
     }
 });
 
+
 io.on("connection", (socket) => {
     console.log('user: ',socket.id);
     // socket.on('send-message', (num: number, room: string) => {
@@ -27,11 +28,10 @@ io.on("connection", (socket) => {
         if(connectedSockets && connectedSockets?.size === 2){
             io.to(socketId).emit('roomJoinError',{
                 error: "Room is full please choose another room to play!"
-            })
+            });
         }else{
             await socket.join(room);
-            const connectedSockets = io.sockets.adapter.rooms.get(room);
-            io.to(socketId).emit('roomJoined',room);
+            io.in(room).emit('roomJoined',room);
         }
 
     });
@@ -49,8 +49,12 @@ io.on("connection", (socket) => {
     socket.on('playerReady', (room: string, socketId: string) => {
         // socket.to(room).emit('playerReady',socketId);
         io.in(room).emit('playerReady',socketId);
-    })
+    });
 
+    socket.on('isRoomFull',(room: string) => {
+        const connectedSockets = io.sockets.adapter.rooms.get(room);
+        io.in(room).emit('roomSize',connectedSockets?.size);
+    })
 
 });
 
