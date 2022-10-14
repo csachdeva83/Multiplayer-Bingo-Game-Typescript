@@ -10,15 +10,16 @@ const Bingo = () => {
     const navigate = useNavigate();
 
     const [board, setBoard] = useState<Array<string>>(Array(25).fill(''));
-    const [read, setRead] = useState(false);
-    const [showGrid, setShowGrid] = useState(false);
+    const [read, setRead] = useState<boolean>(false);
+    const [showGrid, setShowGrid] = useState<boolean>(false);
+    const [waitPlayerReady, setWaitPlayerReady] = useState<boolean>(true);
 
     const exitGame = () => {
         socket.emit('leaveRoom', room, socket.id);
     };
 
     const changeColor = (idx: number) => {
-        if (read) {
+        if (read && !waitPlayerReady) {
             const duplicateBoard = board.slice();
 
             if (duplicateBoard[idx] !== 'X') {
@@ -31,6 +32,7 @@ const Bingo = () => {
     const playerReady = () => {
         console.log(board);
         setRead(true);
+        setWaitPlayerReady(true);
         socket.emit('playerReady', room, socket.id);
     };
 
@@ -44,12 +46,17 @@ const Bingo = () => {
                 setShowGrid(true);
             }
         });
+        socket.on('startGame', (socketId: string) => {
+            setWaitPlayerReady(false);
+            alert(`${socketId} turn`);
+        })
 
         return () => {
             socket.off('roomLeft');
             socket.off('playerReady');
             socket.off('leaveBingoPage');
             socket.off('roomSize');
+            socket.off('startGame');
         }
 
     }, [socket]);
@@ -72,7 +79,7 @@ const Bingo = () => {
                                 setBoard(board.map((item, id) =>
                                     id === idx ? item = event.target.value : item
                                 ))
-                            }} onClick={() => changeColor(idx)} readOnly={read} ></Cell>
+                            }} onClick={() => changeColor(idx)} readOnly={read} gameStart={board[idx] === 'X'}></Cell>
                         })}
                     </Grid>
                     <Button onClick={exitGame}>Exit</Button>

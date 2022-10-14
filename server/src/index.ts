@@ -11,17 +11,12 @@ const io = new Server(httpServer, {
     }
 });
 
+let count = 0;
+let socketRoom = '';
 
 io.on("connection", (socket) => {
     console.log('user: ',socket.id);
-    // socket.on('send-message', (num: number, room: string) => {
-    //     console.log(num);
-    //     if(room === ''){
-    //         socket.broadcast.emit("receive-message",num);
-    //     }else{
-    //         socket.to(room).emit("receive-message",num); // except for urself
-    //     }
-    // })
+
 
     socket.on('joinRoom', async (room: string, socketId: string) => {
         const connectedSockets = io.sockets.adapter.rooms.get(room);
@@ -31,6 +26,8 @@ io.on("connection", (socket) => {
             });
         }else{
             await socket.join(room);
+            socketRoom = room;
+            count = 0;
             io.in(room).emit('roomJoined',room);
         }
 
@@ -47,8 +44,17 @@ io.on("connection", (socket) => {
     });
 
     socket.on('playerReady', (room: string, socketId: string) => {
-        // socket.to(room).emit('playerReady',socketId);
+        // socket.to(room).emit('playerReady',socketId); 
         io.in(room).emit('playerReady',socketId);
+        count = count + 1;
+        console.log(count);
+        if(count === 2){
+            const connectedSockets = io.sockets.adapter.rooms.get(room);
+            let arr:Array<string> = [];
+            connectedSockets?.forEach( key => arr.push(key) );
+            count = 0;
+            io.in(room).emit('startGame',Math.random() < 0.5 ?  arr[0] : arr[1]);
+        }
     });
 
     socket.on('isRoomFull',(room: string) => {

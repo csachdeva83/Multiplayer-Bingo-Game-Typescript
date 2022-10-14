@@ -35,14 +35,19 @@ export const Grid = styled.div`
     margin: 20px;
 `;
 
-export const Cell = styled.input`
+interface CellProps {
+    gameStart: boolean;
+}
+
+export const Cell = styled.input<CellProps>`
     border: 2px solid pink;
     background: none;
     width: 130px;
     height: 130px;
-    color: #fff; 
     text-align: center;
+    color: #fff;
     font-size: 4rem;
+    background-color: ${props => props.gameStart ? '#ef4923' : null};
 `;
 
 export const Text = styled.span`
