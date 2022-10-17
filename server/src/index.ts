@@ -47,7 +47,6 @@ io.on("connection", (socket) => {
         // socket.to(room).emit('playerReady',socketId); 
         io.in(room).emit('playerReady',socketId);
         count = count + 1;
-        console.log(count);
         if(count === 2){
             const connectedSockets = io.sockets.adapter.rooms.get(room);
             let arr:Array<string> = [];
@@ -60,7 +59,11 @@ io.on("connection", (socket) => {
     socket.on('isRoomFull',(room: string) => {
         const connectedSockets = io.sockets.adapter.rooms.get(room);
         io.in(room).emit('roomSize',connectedSockets?.size);
-    })
+    });
+
+    socket.on('cellClicked',(cellValue: number,  room: string) => {
+        socket.to(room).emit('cellColorChange',cellValue);
+    });
 
 });
 

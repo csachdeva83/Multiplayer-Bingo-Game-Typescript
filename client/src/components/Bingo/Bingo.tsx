@@ -24,13 +24,13 @@ const Bingo = () => {
 
             if (duplicateBoard[idx] !== 'X') {
                 duplicateBoard[idx] = 'X';
+                socket.emit('cellClicked', board[idx], room);
                 setBoard(duplicateBoard);
             }
         }
     };
 
     const playerReady = () => {
-        console.log(board);
         setRead(true);
         setWaitPlayerReady(true);
         socket.emit('playerReady', room, socket.id);
@@ -42,14 +42,26 @@ const Bingo = () => {
         socket.on('leaveBingoPage', () => navigate('/home'));
         socket.on('playerReady', (socketId: string) => alert(`${socketId} is ready!`));
         socket.on('roomSize', (roomSize: number) => {
-            if(roomSize === 2){
+            if (roomSize === 2) {
                 setShowGrid(true);
             }
         });
         socket.on('startGame', (socketId: string) => {
             setWaitPlayerReady(false);
             alert(`${socketId} turn`);
-        })
+        });
+        socket.on('cellColorChange', (cellValue: string) => {
+            console.log('board',board);
+            const duplicateBoard = board.slice();
+            console.log(1,duplicateBoard);
+            for(let i=0;i<duplicateBoard.length; i+=1){
+                if(duplicateBoard[i] === cellValue){
+                    duplicateBoard[i] = 'X';
+                }
+            }
+            setBoard(duplicateBoard);
+            console.log(2,duplicateBoard);
+        });
 
         return () => {
             socket.off('roomLeft');
@@ -57,13 +69,14 @@ const Bingo = () => {
             socket.off('leaveBingoPage');
             socket.off('roomSize');
             socket.off('startGame');
+            socket.off('cellColorChange');
         }
 
     }, [socket]);
 
     useEffect(() => {
 
-        socket.emit('isRoomFull',room);
+        socket.emit('isRoomFull', room);
 
     }, [showGrid]);
 
