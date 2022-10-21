@@ -58,7 +58,9 @@ io.on("connection", (socket) => {
 
     socket.on('isRoomFull',(room: string) => {
         const connectedSockets = io.sockets.adapter.rooms.get(room);
-        io.in(room).emit('roomSize',connectedSockets?.size);
+        const array: string[] = [];
+        new Set(connectedSockets).forEach(v => array.push(v));
+        io.in(room).emit('roomSize',array);
     });
 
     socket.on('cellClicked',(cellValue: number,  room: string) => {
