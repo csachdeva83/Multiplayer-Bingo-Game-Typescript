@@ -50,7 +50,7 @@ const Login: React.FC = () => {
             <RightContainer>
                 <Content>
                     <Title>BINGO MULTIPLAYER GAME</Title>
-                    <Description>Bingo is a game of chance in which each player matches the numbers printed in different arrangements on cards. The game host draws at random, marking the selected numbers with tiles</Description>
+                    <Description>Bingo is a game of chance in which each player matches the numbers printed in different arrangements on cards. The game host draws at random, marking the selected numbers with tiles.</Description>
                     <LoginButton onClick={handleAuth}>LOG IN</LoginButton>
                 </Content>
             </RightContainer>

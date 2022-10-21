@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button, Cell, Container, Grid, Text } from './BingoStyle';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
@@ -14,19 +14,23 @@ const Bingo = () => {
     const [read, setRead] = useState<boolean>(false);
     const [showGrid, setShowGrid] = useState<boolean>(false);
     const [waitPlayerReady, setWaitPlayerReady] = useState<boolean>(true);
+    const [turn, setTurn] = useState(socket.id);
+
+    const players: any = {};
 
     const exitGame = () => {
         socket.emit('leaveRoom', room, socket.id);
     };
 
     const changeColor = (idx: number) => {
-        if (read && !waitPlayerReady) {
+        if (read && !waitPlayerReady && turn === socket.id) {
             const duplicateBoard = board.slice();
 
             if (duplicateBoard[idx] !== 'X') {
                 duplicateBoard[idx] = 'X';
                 socket.emit('cellClicked', board[idx], room);
                 setBoard(duplicateBoard);
+                setTurn(players['X'] ? players['O'] : players['X']);
             }
         }
     };
@@ -43,22 +47,28 @@ const Bingo = () => {
         socket.on('roomLeft', (socketId) => alert(`${socketId} left room ${room}`));
         socket.on('leaveBingoPage', () => navigate('/home'));
         socket.on('playerReady', (socketId: string) => alert(`${socketId} is ready!`));
-        socket.on('roomSize', (roomSize: number) => {
-            if (roomSize === 2) {
+        socket.on('roomSize', (connectedSockets: string[]) => {
+            if (connectedSockets.length === 2) {
                 setShowGrid(true);
+                players['X'] = connectedSockets[0];
+                players['O'] = connectedSockets[1];
+
+
             }
         });
         socket.on('startGame', (socketId: string) => {
             setWaitPlayerReady(false);
+            setTurn(socketId);
             alert(`${socketId} turn`);
         });
         socket.on('cellColorChange', (cellValue: string) => {
             const duplicateBoard = boardRef.current.slice();
-            for(let i=0;i<duplicateBoard.length; i+=1){
-                if(duplicateBoard[i] === cellValue){
+            for (let i = 0; i < duplicateBoard.length; i += 1) {
+                if (duplicateBoard[i] === cellValue) {
                     duplicateBoard[i] = 'X';
                 }
             }
+            setTurn(socket.id);
             setBoard(duplicateBoard);
         });
 

@@ -3,7 +3,6 @@ import styled from "styled-components";
 export const Container = styled.div`
     width: 100vw;
     height: 100vh;
-    border: 2px solid black;
     display: flex;
 `;
 
@@ -15,7 +14,6 @@ export const BgImage = styled.img`
 export const LeftContainer = styled.div`
     flex: 1 1 auto;
     height: 100%;
-    border: 2px solid green;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -24,7 +22,6 @@ export const LeftContainer = styled.div`
     
     export const RightContainer = styled.div`
     width: 45%;
-    border: 4px solid pink;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -33,7 +30,6 @@ export const LeftContainer = styled.div`
 
 export const Content = styled.div`
     width: fit-content;
-    border: 2px solid blue;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -52,6 +48,7 @@ export const Description = styled.p`
     font-size: 1.5rem;
     color: #fff;
     margin-bottom: 30px;
+    text-align: center;
 `;
 
 export const LoginButton = styled.button`
