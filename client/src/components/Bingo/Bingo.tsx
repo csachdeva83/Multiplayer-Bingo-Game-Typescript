@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Cell, Container, Grid, Text, ButtonContainer, BingoRow, BingoCell, Modal} from './BingoStyle';
+import { Button, Cell, Container, Grid, Text, ButtonContainer, BingoRow, BingoCell, Modal } from './BingoStyle';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { socket } from '../../service/socket-io';
 
+let players: any = {};
 
 const Bingo = () => {
 
@@ -22,8 +23,6 @@ const Bingo = () => {
     const countRef = useRef(0);
 
 
-    const players: any = {};
-
     const exitGame = () => {
         socket.emit('leaveRoom', room, socket.id);
     };
@@ -37,7 +36,7 @@ const Bingo = () => {
                 duplicateBoard[idx] = 'X';
                 socket.emit('cellClicked', board[idx], room);
                 setBoard(duplicateBoard);
-                setTurn(players['X'] ? players['O'] : players['X']);
+                setTurn(turn === Object.keys(players)[0] ? Object.keys(players)[1] : Object.keys(players)[0]);
             }
         }
     };
@@ -50,22 +49,19 @@ const Bingo = () => {
 
     useEffect(() => {
 
-        socket.on('roomLeft', (socketId) => alert(`${socketId} left room ${room}`));
+        socket.on('roomLeft', (socketId) => alert(`${players[socketId]} left room ${room}`));
         socket.on('leaveBingoPage', () => navigate('/home'));
-        socket.on('playerReady', (socketId: string) => alert(`${socketId} is ready!`));
-        socket.on('roomSize', (connectedSockets: string[]) => {
-            if (connectedSockets.length === 2) {
+        socket.on('playerReady', (socketId: string) => alert(`${players[socketId]} is ready!`));
+        socket.on('roomSize', (playersObject: any) => {
+            if (Object.keys(playersObject).length === 2) {
                 setShowGrid(true);
-                players['X'] = connectedSockets[0];
-                players['O'] = connectedSockets[1];
-
-
+                players = playersObject;
             }
         });
         socket.on('startGame', (socketId: string) => {
             setWaitPlayerReady(false);
             setTurn(socketId);
-            alert(`${socketId} turn`);
+            alert(`${players[socketId]} turn`);
         });
         socket.on('cellColorChange', (cellValue: string) => {
             const duplicateBoard = boardRef.current.slice();
@@ -78,7 +74,7 @@ const Bingo = () => {
             setBoard(duplicateBoard);
         });
         socket.on('playerWon', (socketId: string) => {
-            setPlayerWon(socketId);
+            setPlayerWon(players[socketId]);
             setOpenModal(true);
         })
 

@@ -13,12 +13,13 @@ const io = new Server(httpServer, {
 
 let count = 0;
 let socketRoom = '';
+let players:any = {};
 
 io.on("connection", (socket) => {
     console.log('user: ',socket.id);
 
 
-    socket.on('joinRoom', async (room: string, socketId: string) => {
+    socket.on('joinRoom', async (room: string, socketId: string, name: string) => {
         const connectedSockets = io.sockets.adapter.rooms.get(room);
         if(connectedSockets && connectedSockets?.size === 2){
             io.to(socketId).emit('roomJoinError',{
@@ -28,6 +29,9 @@ io.on("connection", (socket) => {
             await socket.join(room);
             socketRoom = room;
             count = 0;
+            if(!(socketId in players)){
+                players[socketId] = name;
+            }
             io.in(room).emit('roomJoined',room);
         }
 
@@ -57,10 +61,13 @@ io.on("connection", (socket) => {
     });
 
     socket.on('isRoomFull',(room: string) => {
-        const connectedSockets = io.sockets.adapter.rooms.get(room);
-        const array: string[] = [];
-        new Set(connectedSockets).forEach(v => array.push(v));
-        io.in(room).emit('roomSize',array);
+        // const connectedSockets = io.sockets.adapter.rooms.get(room);
+        // const array: string[] = [];
+        // new Set(connectedSockets).forEach(v => array.push(v));
+        // io.in(room).emit('roomSize',array);
+        console.log(players);
+        io.in(room).emit('roomSize',players);
+
     });
 
     socket.on('cellClicked',(cellValue: number,  room: string) => {
