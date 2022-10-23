@@ -67,6 +67,10 @@ io.on("connection", (socket) => {
         socket.to(room).emit('cellColorChange',cellValue);
     });
 
+    socket.on('playerWon',(socketId: string,room: string) => {
+        io.in(room).emit('playerWon',socketId);
+    })
+
 });
 
 httpServer.listen(5050, () => console.log('HttpServer is listening on port 5050'));

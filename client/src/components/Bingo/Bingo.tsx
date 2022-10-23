@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Cell, Container, Grid, Text } from './BingoStyle';
+import { Button, Cell, Container, Grid, Text, ButtonContainer, BingoRow, BingoCell, Modal} from './BingoStyle';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { socket } from '../../service/socket-io';
+
 
 const Bingo = () => {
 
@@ -15,6 +16,11 @@ const Bingo = () => {
     const [showGrid, setShowGrid] = useState<boolean>(false);
     const [waitPlayerReady, setWaitPlayerReady] = useState<boolean>(true);
     const [turn, setTurn] = useState(socket.id);
+    const [count, setCount] = useState(0);
+    const [openModal, setOpenModal] = useState(false);
+    const [playerWon, setPlayerWon] = useState('');
+    const countRef = useRef(0);
+
 
     const players: any = {};
 
@@ -23,7 +29,8 @@ const Bingo = () => {
     };
 
     const changeColor = (idx: number) => {
-        if (read && !waitPlayerReady && turn === socket.id) {
+
+        if (read && !waitPlayerReady && turn === socket.id && !openModal) {
             const duplicateBoard = board.slice();
 
             if (duplicateBoard[idx] !== 'X') {
@@ -40,7 +47,6 @@ const Bingo = () => {
         setWaitPlayerReady(true);
         socket.emit('playerReady', room, socket.id);
     };
-
 
     useEffect(() => {
 
@@ -71,6 +77,10 @@ const Bingo = () => {
             setTurn(socket.id);
             setBoard(duplicateBoard);
         });
+        socket.on('playerWon', (socketId: string) => {
+            setPlayerWon(socketId);
+            setOpenModal(true);
+        })
 
         return () => {
             socket.off('roomLeft');
@@ -92,29 +102,91 @@ const Bingo = () => {
     useEffect(() => {
 
         boardRef.current = board;
+        countRef.current = 0;
+        const lines = [
+            [0, 1, 2, 3, 4],
+            [5, 6, 7, 8, 9],
+            [10, 11, 12, 13, 14],
+            [15, 16, 17, 18, 19],
+            [20, 21, 22, 23, 24],
+            [0, 5, 10, 15, 20],
+            [1, 6, 11, 16, 21],
+            [2, 7, 12, 17, 22],
+            [3, 8, 13, 18, 23],
+            [4, 9, 14, 19, 24],
+            [0, 6, 12, 18, 24],
+            [4, 8, 12, 16, 20]
+        ];
+
+        for (let i = 0; i < lines.length; i++) {
+            const [a, b, c, d, e] = lines[i];
+            if (board[a] && board[a] === board[b] && board[a] === board[c] && board[a] === board[d] && board[a] === board[e]) {
+                countRef.current = countRef.current + 1;
+            }
+            if (countRef.current === 5) {
+                socket.emit('playerWon', socket.id, room);
+                break;
+            }
+        }
+        setCount(countRef.current);
 
     }, [board]);
 
     return (
-        <Container>
-            {!showGrid ?
-                <Text>Waiting for another player to join!</Text>
-                :
-                <>
-                    <Grid>
-                        {board.map((value, idx) => {
-                            return <Cell key={idx} value={board[idx]} onChange={event => {
-                                setBoard(board.map((item, id) =>
-                                    id === idx ? item = event.target.value : item
-                                ))
-                            }} onClick={() => changeColor(idx)} readOnly={read} gameStart={board[idx] === 'X'}></Cell>
-                        })}
-                    </Grid>
-                    <Button onClick={exitGame}>Exit</Button>
-                    <Button onClick={playerReady}>Ready</Button>
-                </>
+        <>
+            {openModal &&
+                <Modal>
+                    {playerWon} Bingo!
+                    <ButtonContainer>
+                        <Button onClick={exitGame}>Exit</Button>
+                        <Button onClick={() => {
+                            setRead(false);
+                            setShowGrid(false);
+                            setBoard(Array(25).fill(''));
+                            setOpenModal(false);
+                        }}>Play Again</Button>
+                    </ButtonContainer>
+                </Modal>
             }
-        </Container>
+            <Container openModal={openModal}>
+
+                {!showGrid ?
+                    <>
+                        <Text>Waiting for another player to join!</Text>
+                        <ButtonContainer>
+                            <Button onClick={exitGame}>Exit</Button>
+                        </ButtonContainer>
+                    </>
+                    :
+                    <>
+                        <Grid>
+                            {board.map((value, idx) => {
+                                return <Cell key={idx} value={board[idx]} onChange={event => {
+                                    setBoard(board.map((item, id) =>
+                                        id === idx ? item = event.target.value : item
+                                    ))
+                                }} onClick={() => changeColor(idx)} readOnly={read} gameStart={board[idx] === 'X'}></Cell>
+                            })}
+                        </Grid>
+                        {
+                            !read ?
+                                <ButtonContainer>
+                                    <Button onClick={exitGame}>Exit</Button>
+                                    <Button onClick={playerReady}>Ready</Button>
+                                </ButtonContainer>
+                                :
+                                <BingoRow>
+                                    <BingoCell changeColor={count >= 1}>B</BingoCell>
+                                    <BingoCell changeColor={count >= 2}>I</BingoCell>
+                                    <BingoCell changeColor={count >= 3}>N</BingoCell>
+                                    <BingoCell changeColor={count >= 4}>G</BingoCell>
+                                    <BingoCell changeColor={count >= 5}>O</BingoCell>
+                                </BingoRow>
+                        }
+                    </>
+                }
+            </Container>
+        </>
     )
 }
 
