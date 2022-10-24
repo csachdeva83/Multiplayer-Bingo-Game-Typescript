@@ -10,7 +10,6 @@ export const Container = styled.div<ContainerProps>`
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px solid green;
     flex-direction: column;
     background-color: ${props => props.openModal ? '#111' : null};
     opacity: ${props => props.openModal ? 0.25 : null};

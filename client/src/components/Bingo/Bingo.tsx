@@ -43,9 +43,36 @@ const Bingo = () => {
     };
 
     const playerReady = () => {
-        setRead(true);
-        setWaitPlayerReady(true);
-        socket.emit('playerReady', room, socket.id);
+        let error = false;
+        let numberCountMap:any = {};
+        for(let i=0;i<board.length;i+=1){
+            if(/^\d+$/.test(board[i]) && board[i].length < 3 && board[i].length > 0){
+                if(board[i] in numberCountMap){
+                    error = true;
+                    break;
+                }else{
+                    numberCountMap[board[i]] = 1;
+                }
+            }else{
+                error = true;
+                break;
+            }
+        }
+        for(let i=1; i<=25; i+=1){
+            if((i in numberCountMap) && numberCountMap[i] === 1){
+                continue;
+            }else{
+                error = true;
+                break;
+            }
+        }
+        if(error){
+            alert('Please fill all cells with unique numbers between 1-25, inclusive.')
+        }else{
+            setRead(true);
+            setWaitPlayerReady(true);
+            socket.emit('playerReady', room, socket.id);
+        }
     };
 
     useEffect(() => {
