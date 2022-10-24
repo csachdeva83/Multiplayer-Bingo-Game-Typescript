@@ -1,4 +1,4 @@
-import express from 'express';
+import express, {Request, Response} from 'express';
 import { createServer } from "http";
 import { Server } from "socket.io";
 
@@ -14,6 +14,10 @@ const io = new Server(httpServer, {
 let count = 0;
 let socketRoom = '';
 let players:any = {};
+
+app.get('/', (req:Request,res:Response) => {
+    res.send("It's working!");
+});
 
 io.on("connection", (socket) => {
     console.log('user: ',socket.id);
