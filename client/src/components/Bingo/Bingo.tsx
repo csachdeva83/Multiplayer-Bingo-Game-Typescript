@@ -178,6 +178,7 @@ const Bingo = () => {
                                     <BingoCell changeColor={count >= 4}>G</BingoCell>
                                     <BingoCell changeColor={count >= 5}>O</BingoCell>
                                 </BingoRow>
+                                 
                         }
                     </>
                 }

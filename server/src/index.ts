@@ -39,6 +39,7 @@ io.on("connection", (socket) => {
 
     socket.on('leaveRoom', async (room: string, socketId: string) => {
         await socket.leave(room);
+        delete players[socketId];
         const connectedSockets = io.sockets.adapter.rooms.get(room);
         if(!connectedSockets || connectedSockets?.size < 2){
             io.to(socketId).emit('leaveBingoPage');
@@ -61,12 +62,15 @@ io.on("connection", (socket) => {
     });
 
     socket.on('isRoomFull',(room: string) => {
-        // const connectedSockets = io.sockets.adapter.rooms.get(room);
-        // const array: string[] = [];
-        // new Set(connectedSockets).forEach(v => array.push(v));
-        // io.in(room).emit('roomSize',array);
-        console.log(players);
-        io.in(room).emit('roomSize',players);
+        const connectedSockets = io.sockets.adapter.rooms.get(room);
+        const array: string[] = [];
+        connectedSockets?.forEach(v => array.push(v));
+
+        const roomPlayers:any = {};
+        roomPlayers[array[0]] = players[array[0]];
+        roomPlayers[array[1]] = players[array[1]];
+
+        io.in(room).emit('roomSize',roomPlayers);
 
     });
 
