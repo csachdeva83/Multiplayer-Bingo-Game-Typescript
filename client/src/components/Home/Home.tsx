@@ -13,7 +13,11 @@ const Home = () => {
     const navigate = useNavigate();
 
     const joinRoom = async () => {
-        socket.emit('joinRoom', room, socket.id, userName);
+        if(room.length > 0){
+            socket.emit('joinRoom', room, socket.id, userName);
+        }else{
+            alert('Please enter a room with more than 1 characters.');
+        }
     };
 
     useEffect(() => {
@@ -34,7 +38,7 @@ const Home = () => {
         <Container>
             <ModalContainer>
                 <Title> Create / Join Room</Title>
-                <InputBox value={room} onChange={(event) => setRoom(event.target.value)} placeholder="ROOM NAME"></InputBox>
+                <InputBox value={room} onKeyPress={(event) => event.key === 'Enter' ? joinRoom() : null} onChange={(event) => setRoom(event.target.value)} placeholder="ROOM NAME"></InputBox>
                 <SubmitButton onClick={joinRoom}>SUBMIT</SubmitButton>
             </ModalContainer>
         </Container>
