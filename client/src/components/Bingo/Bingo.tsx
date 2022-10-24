@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Button, Cell, Container, Grid, Text, ButtonContainer, BingoRow, BingoCell, Modal } from './BingoStyle';
+import { Button, Cell, Container, Grid, Text, ButtonContainer, BingoRow, BingoCell, Modal, BingoText, GridContainer } from './BingoStyle';
 import { useParams } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { socket } from '../../service/socket-io';
@@ -16,10 +16,11 @@ const Bingo = () => {
     const [read, setRead] = useState<boolean>(false);
     const [showGrid, setShowGrid] = useState<boolean>(false);
     const [waitPlayerReady, setWaitPlayerReady] = useState<boolean>(true);
-    const [turn, setTurn] = useState(socket.id);
-    const [count, setCount] = useState(0);
-    const [openModal, setOpenModal] = useState(false);
-    const [playerWon, setPlayerWon] = useState('');
+    const [turn, setTurn] = useState<string>(socket.id);
+    const [count, setCount] = useState<number>(0);
+    const [openModal, setOpenModal] = useState<boolean>(false);
+    const [playerWon, setPlayerWon] = useState<string>('');
+    const [displayTurnContainer,setDisplayTurnContainer] = useState<boolean>(false);
     const countRef = useRef(0);
 
 
@@ -50,7 +51,10 @@ const Bingo = () => {
     useEffect(() => {
 
         socket.on('roomLeft', (socketId) => alert(`${players[socketId]} left room ${room}`));
-        socket.on('leaveBingoPage', () => navigate('/home'));
+        socket.on('leaveBingoPage', () => {
+            navigate('/home');
+            setDisplayTurnContainer(false);
+        });
         socket.on('playerReady', (socketId: string) => alert(`${players[socketId]} is ready!`));
         socket.on('roomSize', (playersObject: any) => {
             if (Object.keys(playersObject).length === 2) {
@@ -61,7 +65,7 @@ const Bingo = () => {
         socket.on('startGame', (socketId: string) => {
             setWaitPlayerReady(false);
             setTurn(socketId);
-            alert(`${players[socketId]} turn`);
+            setDisplayTurnContainer(true);
         });
         socket.on('cellColorChange', (cellValue: string) => {
             const duplicateBoard = boardRef.current.slice();
@@ -140,6 +144,7 @@ const Bingo = () => {
                             setShowGrid(false);
                             setBoard(Array(25).fill(''));
                             setOpenModal(false);
+                            setDisplayTurnContainer(false);
                         }}>Play Again</Button>
                     </ButtonContainer>
                 </Modal>
@@ -155,15 +160,18 @@ const Bingo = () => {
                     </>
                     :
                     <>
-                        <Grid>
-                            {board.map((value, idx) => {
-                                return <Cell key={idx} value={board[idx]} onChange={event => {
-                                    setBoard(board.map((item, id) =>
-                                        id === idx ? item = event.target.value : item
-                                    ))
-                                }} onClick={() => changeColor(idx)} readOnly={read} gameStart={board[idx] === 'X'}></Cell>
-                            })}
-                        </Grid>
+                        <GridContainer>
+                            <Grid>
+                                {board.map((value, idx) => {
+                                    return <Cell key={idx} value={board[idx]} onChange={event => {
+                                        setBoard(board.map((item, id) =>
+                                            id === idx ? item = event.target.value : item
+                                        ))
+                                    }} onClick={() => changeColor(idx)} readOnly={read} gameStart={board[idx] === 'X'} cursorPointer={read}></Cell>
+                                })}
+                            </Grid>
+                            <BingoText show={displayTurnContainer}>{players[turn]} Turn</BingoText>
+                        </GridContainer>
                         {
                             !read ?
                                 <ButtonContainer>
@@ -171,7 +179,7 @@ const Bingo = () => {
                                     <Button onClick={playerReady}>Ready</Button>
                                 </ButtonContainer>
                                 :
-                                <BingoRow>
+                                <BingoRow marginLeft={displayTurnContainer}>
                                     <BingoCell changeColor={count >= 1}>B</BingoCell>
                                     <BingoCell changeColor={count >= 2}>I</BingoCell>
                                     <BingoCell changeColor={count >= 3}>N</BingoCell>

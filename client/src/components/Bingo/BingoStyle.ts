@@ -49,6 +49,7 @@ export const Grid = styled.div`
 
 interface CellProps {
     gameStart: boolean;
+    cursorPointer: boolean;
 }
 
 export const Cell = styled.input<CellProps>`
@@ -60,6 +61,31 @@ export const Cell = styled.input<CellProps>`
     color: #fff;
     font-size: 4rem;
     background-color: ${props => props.gameStart ? '#ef4923' : null};
+    cursor: ${ props => props.cursorPointer ? 'pointer': null };
+`;
+
+interface BingoTextProps {
+    show: boolean;
+};
+
+export const BingoText = styled.div<BingoTextProps>`
+    color: white;
+    writing-mode: vertical-lr;
+    text-orientation: upright;
+    letter-spacing: 7px;
+    text-transform: uppercase;
+    border: 10px solid;
+    border-image-slice: 1;
+    border-width: 5px;
+    border-image-source: linear-gradient(to left, #743ad5, #d53a9d);
+    border-radius: 50%;
+    padding: 10px;
+    display: ${props => props.show ? 'block' : 'none'};
+`;
+
+export const GridContainer = styled.div`
+    display: flex;
+    align-items: center;
 `;
 
 export const Text = styled.span`
@@ -67,9 +93,15 @@ export const Text = styled.span`
     color: #fff;
 `;
 
-export const BingoRow = styled.div`
+interface BingoRowProps {
+    marginLeft: boolean;
+};
+
+export const BingoRow = styled.div<BingoRowProps>`
     display: flex;
     margin-top: 20px;
+    align-items: center;
+    margin-left: ${props => props.marginLeft ? '-45px' : '0'};
 `;
 
 interface BingoCellProps {
