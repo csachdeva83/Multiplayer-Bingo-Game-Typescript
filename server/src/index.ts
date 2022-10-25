@@ -90,4 +90,4 @@ io.on("connection", (socket) => {
 
 });
 
-httpServer.listen(5050, () => console.log('HttpServer is listening on port 5050'));
+httpServer.listen(process.env.PORT || 5050, () => console.log('HttpServer is working'));
