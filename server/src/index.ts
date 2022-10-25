@@ -7,7 +7,9 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
-        origin: ["http://localhost:3000"]
+        // origin: ["http://localhost:3000"]
+        origin: ["https://multiplayer-bingo-game.netlify.app"],
+        credentials:true
     }
 });
 
