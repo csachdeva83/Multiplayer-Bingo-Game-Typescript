@@ -6,7 +6,8 @@ interface ContainerProps {
 
 export const Container = styled.div<ContainerProps>`
     width: 100vw;
-    height: 100vh;
+    height: calc(100vh - 70px);
+    margin-top: 70px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -54,13 +55,31 @@ interface CellProps {
 export const Cell = styled.input<CellProps>`
     border: 2px solid pink;
     background: none;
-    width: 130px;
-    height: 130px;
     text-align: center;
     color: #fff;
     font-size: 4rem;
     background-color: ${props => props.gameStart ? '#ef4923' : null};
     cursor: ${ props => props.cursorPointer ? 'pointer': null };
+
+    @media (min-width: 1200px) {
+        width: 15vh;
+        height: 15vh;
+    }
+
+    @media (min-width: 901px) and (max-width: 1999px) {
+        width: 15vh;
+        height: 15vh;
+    }
+
+    @media (min-width: 651px) and (max-width: 900px) {
+        width: 14vh;
+        height: 14vh;
+    }
+
+    @media (max-width: 650px) {
+        width: 18vw;
+        height: 18vw;
+    }
 `;
 
 interface BingoTextProps {
