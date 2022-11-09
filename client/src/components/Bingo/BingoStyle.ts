@@ -18,7 +18,8 @@ export const Container = styled.div<ContainerProps>`
 
 export const ButtonContainer = styled.div`
     width: 200px;
-    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
     display: flex;
     margin-top: 20px;
 `;
@@ -107,7 +108,7 @@ export const GridContainer = styled.div`
 `;
 
 export const Text = styled.span`
-    font-size: 5vw;
+    font-size: 6vw;
     color: #fff;
 `;
 
@@ -129,8 +130,25 @@ interface BingoCellProps {
 export const BingoCell = styled.div<BingoCellProps>`
     border: 2px solid #E1FFB1;
     background: none;
-    width: 130px;
-    height: 130px;
+    @media (min-width: 1200px) {
+        width: 15vh;
+        height: 15vh;
+    }
+
+    @media (min-width: 901px) and (max-width: 1999px) {
+        width: 15vh;
+        height: 15vh;
+    }
+
+    @media (min-width: 651px) and (max-width: 900px) {
+        width: 14vh;
+        height: 14vh;
+    }
+
+    @media (max-width: 650px) {
+        width: 18vw;
+        height: 18vw;
+    }
     display: ${props => props.changeColor ? 'none' : 'flex'};
     align-items: center;
     justify-content: center;

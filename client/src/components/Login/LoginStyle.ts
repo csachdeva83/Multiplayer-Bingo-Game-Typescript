@@ -4,21 +4,31 @@ export const Container = styled.div`
     width: 100vw;
     height: 100vh;
     display: flex;
+
+    @media (max-width: 650px) {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
 `;
 
 export const BgImage = styled.img`
     width: 70%;
-    min-width: 400px;
+    min-width: 300px;
 `;
 
 export const LeftContainer = styled.div`
-    flex: 1 1 auto;
+    flex: 1 20 auto;
     height: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    `;
+
+    @media (max-width: 650px) {
+        display: none;
+    }
+`;
     
     export const RightContainer = styled.div`
     width: 45%;
@@ -26,6 +36,9 @@ export const LeftContainer = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    @media (max-width: 650px) {
+        width: 100%;
+    }
 `;
 
 export const Content = styled.div`
@@ -34,7 +47,10 @@ export const Content = styled.div`
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 0 15px;
+    padding: 0 15px 0 0;
+    @media (max-width: 650px) {
+        padding: 0 15px;
+    }
 `;
 
 export const Title = styled.p`
@@ -42,6 +58,9 @@ export const Title = styled.p`
     font-weight: 500;
     color: red;
     margin-bottom: 30px;
+    @media (max-width: 650px) {
+        font-size: 6.7vw;
+    }
 `;
 
 export const Description = styled.p`
@@ -49,6 +68,9 @@ export const Description = styled.p`
     color: #fff;
     margin-bottom: 30px;
     text-align: center;
+    @media (max-width: 650px) {
+        font-size: 1.4rem;
+    }
 `;
 
 export const LoginButton = styled.button`

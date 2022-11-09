@@ -18,7 +18,10 @@ export const ModalContainer = styled.div`
     border-image-source: linear-gradient(to left, #743ad5, #d53a9d);
     align-items: center;
     justify-content: center;
-    flex-direction: column;    
+    flex-direction: column;  
+    @media (max-width: 650px) {
+        width: 80%;
+    }  
 `;
 
 export const Title = styled.span`
